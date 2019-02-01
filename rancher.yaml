@@ -86,9 +86,9 @@ metadata:
 #    kubernetes.io/tls-acme: "true"
 #    ingress.kubernetes.io/secure-backends: "true"
 spec:
-#  tls:
-#    - hosts:
-#      - rancher.localhost
+ tls:
+   - hosts:
+     - rancher.localhost
  rules:
    - host: rancher.localhost
      http:
