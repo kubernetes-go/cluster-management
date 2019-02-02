@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: portainer
+  name: portainer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portainer
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: portainer
+    spec:
+      containers:
+      - image:  portainer/portainer
+        imagePullPolicy: Always
+        name: portainer
+        ports:
+        - containerPort: 9000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 5
+          timeoutSeconds: 30
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: portainer
+  labels:
+    app: portainer
+spec: 
+  ports: 
+    - port: 80
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: portainer
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+ name: portainer-ingress
+ annotations:
+   nginx.ingress.kubernetes.io/rewrite-target: /
+   kubernetes.io/tls-acme: "true"
+   ingress.kubernetes.io/secure-backends: "true"
+ namespace: default
+spec:
+ tls:
+   - hosts:
+     - portainer.myhost.k8s
+ rules:
+   - host: portainer.myhost.k8s
+     http: 
+       paths:
+         - path: /
+           backend: 
+             serviceName: portainer
+             servicePort: 80

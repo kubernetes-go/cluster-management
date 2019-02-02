@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: registry
+  name: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: registry
+    spec:
+      containers:
+      - image:  registry:2
+        imagePullPolicy: Always
+        name: registry
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 5
+          timeoutSeconds: 30
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: registry
+  labels:
+    app: registry
+spec: 
+  ports: 
+    - port: 80
+      targetPort: 5000
+      protocol: TCP
+  selector:
+    app: registry
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+ name: registry-ingress
+ annotations:
+   nginx.ingress.kubernetes.io/rewrite-target: /
+   kubernetes.io/tls-acme: "true"
+   ingress.kubernetes.io/secure-backends: "true"
+ namespace: default
+spec:
+ tls:
+   - hosts:
+     - registry.myhost.k8s
+ rules:
+   - host: registry.myhost.k8s
+     http: 
+       paths:
+         - path: /
+           backend: 
+             serviceName: registry
+             servicePort: 80

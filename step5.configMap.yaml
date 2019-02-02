@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-management-config
+  namespace: default
+data:
+  rootDomain: myhost.k8s
+  rancherDomain: rancher.myhost.k8s
+  jenkinsDomain: jenkins.myhost.k8s
+  portainerDomain: portainer.myhost.k8s
+  registoryDomain: registory.myhost.k8s

@@ -82,18 +82,22 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
  name: rancher-ingress
-#  annotations:
-#    kubernetes.io/tls-acme: "true"
-#    ingress.kubernetes.io/secure-backends: "true"
+ annotations:
+   kubernetes.io/tls-acme: "true"
+   ingress.kubernetes.io/secure-backends: "true"
+   nginx.ingress.kubernetes.io/rewrite-target: /
+ namespace: default
 spec:
  tls:
    - hosts:
-     - rancher.localhost
+     - rancher.myhost.k8s
  rules:
-   - host: rancher.localhost
-     http:
+   - host: rancher.myhost.k8s
+     http: 
        paths:
          - path: /
            backend: 
              serviceName: rancher
              servicePort: 80
+
+---
